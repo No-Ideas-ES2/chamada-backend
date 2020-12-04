@@ -1,6 +1,7 @@
 import { Router } from 'express'
+import { idValidation } from '../common/commonValidation'
 import DisciplinaController from './disciplinaController'
-import { idValidation, insertValidation, updateValidation } from './disciplinaValidation'
+import { insertValidation, updateValidation } from './disciplinaValidation'
 
 const router = Router()
 

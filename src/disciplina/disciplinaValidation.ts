@@ -1,8 +1,7 @@
-import { body, param, oneOf } from 'express-validator'
+import { body, oneOf } from 'express-validator'
+import { idValidation } from '../common/commonValidation'
 
-export const idValidation = [
-  param('id').isUUID()
-]
+
 
 export const insertValidation = [
   body('codigo').isString().notEmpty(),
