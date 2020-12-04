@@ -35,6 +35,8 @@
         "semi": [
             "error",
             "never"
-        ]
-    }
+        ],
+        "no-var": "error"
+    },
+    "ignorePatterns": "**/*.d.ts"
 }
