@@ -1,14 +1,12 @@
 import PostgresClient from '../database/postgresClient'
 
 export default class DisciplinaModel {
+  static selectList = ['id', 'codigo', 'nome', 'criado_em', 'atualizado_em', 'excluido_em']
+
   static async findOneById(id: string) {
     const sql = `
     SELECT
-      id,
-      codigo,
-      nome,
-      criado_em,
-      atualizado_em
+      ${DisciplinaModel.selectList.join(',')}
     FROM
       disciplina
     WHERE
@@ -27,11 +25,7 @@ export default class DisciplinaModel {
   static async findAll() {
     const sql = `
     SELECT
-      id,
-      codigo,
-      nome,
-      criado_em,
-      atualizado_em
+      ${DisciplinaModel.selectList.join(',')}
     FROM
       disciplina
     WHERE

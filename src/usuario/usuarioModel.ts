@@ -1,15 +1,12 @@
 import PostgresClient from '../database/postgresClient'
 
 export default class UsuarioModel {
+  static selectList = ['id', 'nome', 'email', 'tipo', 'criado_em', 'atualizado_em', 'excluido_em']
+
   static async findOneById(id: string) {
     const sql = `
     SELECT
-      id,
-      nome,
-      email,
-      tipo,
-      criado_em,
-      atualizado_em
+      ${UsuarioModel.selectList.join(',')}
     FROM
       usuario
     WHERE
@@ -25,13 +22,7 @@ export default class UsuarioModel {
   static async findOneByEmail(email: string) {
     const sql = `
     SELECT
-      id,
-      nome,
-      senha,
-      email,
-      tipo,
-      criado_em,
-      atualizado_em
+      ${UsuarioModel.selectList.join(',')}
     FROM
       usuario
     WHERE
@@ -47,12 +38,7 @@ export default class UsuarioModel {
   static async findAll(tipo?: string) {
     let sql = `
     SSELECT
-      id,
-      nome,
-      email,
-      tipo,
-      criado_em,
-      atualizado_em
+      ${UsuarioModel.selectList.join(',')}
     FROM
       usuario
     WHERE

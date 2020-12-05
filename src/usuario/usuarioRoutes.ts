@@ -9,3 +9,5 @@ router.post('/', insertValidation, UsuarioController.post)
 router.get('/:id*?', idValidation, UsuarioController.get)
 router.put('/:id', updateValidation, UsuarioController.put)
 router.delete('/:id', idValidation, UsuarioController.delete)
+
+export default router
