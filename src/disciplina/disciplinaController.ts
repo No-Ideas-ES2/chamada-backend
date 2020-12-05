@@ -7,6 +7,10 @@ export default class DisciplinaController {
   static async get(req: Request, res: Response) {
     try {
       const { id } = req.params
+      const errors = validationResult(req)
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() })
+      }
       const result = await DisciplinaService.get(id)
       return res.status(200).json(result)
     } catch (error) {
