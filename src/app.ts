@@ -1,4 +1,4 @@
-import express from 'express'
+import express, { Request, Response, NextFunction, Errback } from 'express'
 import cors from 'cors'
 import bodyParser from 'body-parser'
 
@@ -22,6 +22,7 @@ class App {
     this.express.use(bodyParser.urlencoded({ extended: true }))
 
     this.express.use('/', router)
+
   }
 }
 
