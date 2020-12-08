@@ -1,5 +1,15 @@
 declare module 'pg-bind' {
-  declare function bind(sql: string, binds: any): any
+  export type ReplaceObject = {
+    [key: string]: any
+  }
 
-  export = bind
+  export type BindInfo = {
+    text: string,
+    values: any[]
+  }
+  export namespace bind {
+    export function insert(queryString: string, replaceObject: ReplaceObject[]): BindInfo
+  }
+  export function bind(queryString: string, replaceObject: ReplaceObject): BindInfo
+
 }

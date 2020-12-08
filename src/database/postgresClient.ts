@@ -1,14 +1,21 @@
 import { Pool } from 'pg'
-import bind from 'pg-bind'
+import { bind, BindInfo, ReplaceObject } from 'pg-bind'
 
 import databaseConfig from '../config/databaseConfig'
 
 export default class PostgresClient {
 
-  static async query(sql: string, binds?: { [key: string]: any }) {
+  static async query(sql: string, binds?: ReplaceObject | ReplaceObject[]) {
     try {
       const pool = PostgresClient.getPool()
-      const prepared = bind(sql, binds || {})
+
+      let prepared: BindInfo
+      if (Array.isArray(binds)) {
+        prepared = bind.insert(sql, binds)
+      } else {
+        prepared = bind(sql, binds || {})
+      }
+      console.log(prepared)
       const result = await pool.query(prepared.text, prepared.values)
       return result
     } catch (err) {
