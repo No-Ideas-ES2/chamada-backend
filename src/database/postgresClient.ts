@@ -1,5 +1,5 @@
 import { Pool } from 'pg'
-import { bind, BindInfo, ReplaceObject } from 'pg-bind'
+import bind, { BindInfo, ReplaceObject } from 'pg-bind'
 
 import databaseConfig from '../config/databaseConfig'
 
