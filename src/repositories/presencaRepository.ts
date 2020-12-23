@@ -1,6 +1,6 @@
-import PostgresClient from "../database/postgresClient"
+import PostgresClient from "../providers/postgresClient"
 
-export default class PresencaModel {
+export default class PresencaRepository {
   static async findByUser(alunoId: string): Promise<any> {
     const sql = `
     SELECT

@@ -1,12 +1,12 @@
-import PostgresClient from '../database/postgresClient'
+import PostgresClient from '../providers/postgresClient'
 
-export default class UsuarioModel {
+export default class UsuarioRepository {
   static selectList = ['id', 'nome', 'email', 'tipo', 'criado_em', 'atualizado_em', 'excluido_em']
 
   static async findOneById(id: string) {
     const sql = `
     SELECT
-      ${UsuarioModel.selectList.join(',')}
+      ${UsuarioRepository.selectList.join(',')}
     FROM
       usuario
     WHERE
@@ -22,7 +22,7 @@ export default class UsuarioModel {
   static async findOneByEmail(email: string) {
     const sql = `
     SELECT
-      ${UsuarioModel.selectList.join(',')}
+      ${UsuarioRepository.selectList.join(',')}
     FROM
       usuario
     WHERE
@@ -38,7 +38,7 @@ export default class UsuarioModel {
   static async findAll(tipo?: string) {
     let sql = `
     SSELECT
-      ${UsuarioModel.selectList.join(',')}
+      ${UsuarioRepository.selectList.join(',')}
     FROM
       usuario
     WHERE

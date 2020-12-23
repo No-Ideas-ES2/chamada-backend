@@ -1,6 +1,6 @@
-import PostgresClient from "../database/postgresClient"
+import PostgresClient from "../providers/postgresClient"
 
-export default class AulaModel {
+export default class AulaRepository {
   static async findOneById(id: string): Promise<any> {
     const sql = `
     SELECT

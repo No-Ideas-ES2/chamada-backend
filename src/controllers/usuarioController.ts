@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 import { validationResult } from 'express-validator'
-import UsuarioService from './usuarioService'
+import UsuarioService from '../services/usuarioService'
 
 export default class UsuarioController {
   static async get(req: Request, res: Response) {

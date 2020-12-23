@@ -1,8 +1,8 @@
 import { ReplaceObject } from 'pg-bind'
-import PostgresClient from '../database/postgresClient'
-import UsuarioModel from '../usuario/usuarioModel'
+import PostgresClient from '../providers/postgresClient'
+import UsuarioRepository from './usuarioRepository'
 
-export default class TurmaModel {
+export default class TurmaRepository {
   static selectList = ['id', 'descricao', 'codigo', 'tipo', 'criado_em', 'atualizado_em', 'excluido_em']
 
   static async findOneById(id: string) {
@@ -66,9 +66,10 @@ export default class TurmaModel {
       :disciplinaId,
       :professorId,
       :descricao
-    )`
+    )
+    RETURNING *`
     const result = await PostgresClient.query(sql, turma)
-    return result.rows
+    return result.rows[0]
   }
 
   static async update(id: string, turma: any) {
@@ -88,7 +89,7 @@ export default class TurmaModel {
     UPDATE
     turma
     SET ${values.join(', ')}
-    WHERE id = : id`
+    WHERE id = :id`
 
     const result = await PostgresClient.query(sql, binds)
     return result.rows
@@ -115,7 +116,8 @@ export default class TurmaModel {
     VALUES(
       :turmaId,
       :alunoId
-    )`
+    )
+    RETURNING *`
 
     const binds: ReplaceObject[] = alunosId.map((alunoId) => ({
       turmaId,
@@ -129,7 +131,7 @@ export default class TurmaModel {
   static async findAlunos(turmaId: string) {
     const sql = `
     SELECT
-      ${UsuarioModel.selectList.join(',')}
+      ${UsuarioRepository.selectList.join(',')}
     FROM 
       usuario
     WHERE

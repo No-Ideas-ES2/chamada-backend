@@ -1,7 +1,6 @@
-import AulaController from "../controllers/aulaController"
-import PostgresClient from "../database/postgresClient"
+import PostgresClient from "../providers/postgresClient"
 
-export default class ChamadaModel {
+export default class ChamadaRepository {
   static async findOneById(id: string): Promise<any> {
     const sql = `
     SELECT 

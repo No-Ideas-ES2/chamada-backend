@@ -1,12 +1,12 @@
-import PostgresClient from '../database/postgresClient'
+import PostgresClient from '../providers/postgresClient'
 
-export default class DisciplinaModel {
+export default class DisciplinaRepository {
   static selectList = ['id', 'codigo', 'nome', 'criado_em', 'atualizado_em', 'excluido_em']
 
   static async findOneById(id: string) {
     const sql = `
     SELECT
-      ${DisciplinaModel.selectList.join(',')}
+      ${DisciplinaRepository.selectList.join(',')}
     FROM
       disciplina
     WHERE
@@ -25,7 +25,7 @@ export default class DisciplinaModel {
   static async findAll() {
     const sql = `
     SELECT
-      ${DisciplinaModel.selectList.join(',')}
+      ${DisciplinaRepository.selectList.join(',')}
     FROM
       disciplina
     WHERE
@@ -42,9 +42,10 @@ export default class DisciplinaModel {
       )
     VALUES (
       :codigo, :nome
-    )`
+    )
+    RETURNING *`
     const result = await PostgresClient.query(sql, disciplina)
-    return result.rows
+    return result.rows[0]
   }
 
   static async update(id: string, disciplina: any) {

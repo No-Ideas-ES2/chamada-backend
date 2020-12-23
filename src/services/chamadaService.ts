@@ -1,23 +1,23 @@
-import ChamadaModel from "../models/chamadaModel";
+import ChamadaRepository from "../repositories/chamadaRepository";
 
 export default class ChamadaService {
 
   static async get(id?: string) {
     if (id) {
-      return ChamadaModel.findOneById(id)
+      return ChamadaRepository.findOneById(id)
     }
-    return ChamadaModel.findAll()
+    return ChamadaRepository.findAll()
   }
 
   static async post(chamada: any) {
-    return ChamadaModel.save(chamada)
+    return ChamadaRepository.save(chamada)
   }
 
   static async update(id: string, chamada: any) {
-    return ChamadaModel.update(id, chamada)
+    return ChamadaRepository.update(id, chamada)
   }
 
   static async delete(id: string) {
-    return ChamadaModel.delete(id)
+    return ChamadaRepository.delete(id)
   }
 }

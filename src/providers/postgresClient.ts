@@ -15,7 +15,6 @@ export default class PostgresClient {
       } else {
         prepared = bind(sql, binds || {})
       }
-      console.log(prepared)
       const result = await pool.query(prepared.text, prepared.values)
       return result
     } catch (err) {

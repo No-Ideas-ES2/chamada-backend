@@ -1,8 +1,8 @@
 import { Router } from 'express'
 
-import DisciplinaRoutes from '../disciplina/disciplinaRoutes'
-import UsuarioRoutes from '../usuario/usuarioRoutes'
-import TurmaRoutes from '../turma/turmaRoutes'
+import DisciplinaRoutes from './disciplina.routes'
+import UsuarioRoutes from './usuario.routes'
+import TurmaRoutes from './turma.routes'
 import AulaRoutes from './aula.routes'
 import ChamadaRoutes from './chamada.routes'
 
