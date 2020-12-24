@@ -1,9 +1,6 @@
 --
--- PostgreSQL database dump
+-- PostgreSQL database configuration
 --
-
--- Dumped from database version 12.4 (Ubuntu 12.4-1.pgdg16.04+1)
--- Dumped by pg_dump version 12.5
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -15,41 +12,31 @@ SET check_function_bodies = false;
 SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
+SET default_tablespace = '';
+SET default_table_access_method = heap;
 
---
--- Name: uuid-ossp; Type: EXTENSION; Schema: -; Owner: -
---
 
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA public;
-
-
---
--- Name: EXTENSION "uuid-ossp"; Type: COMMENT; Schema: -; Owner: 
---
 
 COMMENT ON EXTENSION "uuid-ossp" IS 'generate universally unique identifiers (UUIDs)';
 
 
 --
--- Name: usuario_tipo_enum; Type: TYPE; Schema: public; Owner: ekrumsedfcjcib
+-- TYPES
 --
 
 CREATE TYPE public.usuario_tipo_enum AS ENUM (
     'admin',
     'professor',
-    'aluno',
-    'nenhum'
+    'aluno'
 );
-
 
 ALTER TYPE public.usuario_tipo_enum OWNER TO ekrumsedfcjcib;
 
-SET default_tablespace = '';
 
-SET default_table_access_method = heap;
 
 --
--- Name: aula; Type: TABLE; Schema: public; Owner: ekrumsedfcjcib
+-- TABLES
 --
 
 CREATE TABLE public.aula (
@@ -62,12 +49,9 @@ CREATE TABLE public.aula (
     excluido_em timestamp without time zone
 );
 
-
 ALTER TABLE public.aula OWNER TO ekrumsedfcjcib;
 
---
--- Name: chamada; Type: TABLE; Schema: public; Owner: ekrumsedfcjcib
---
+
 
 CREATE TABLE public.chamada (
     id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
@@ -78,12 +62,9 @@ CREATE TABLE public.chamada (
     excluido_em timestamp without time zone
 );
 
-
 ALTER TABLE public.chamada OWNER TO ekrumsedfcjcib;
 
---
--- Name: disciplina; Type: TABLE; Schema: public; Owner: ekrumsedfcjcib
---
+
 
 CREATE TABLE public.disciplina (
     id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
@@ -94,12 +75,9 @@ CREATE TABLE public.disciplina (
     excluido_em timestamp without time zone
 );
 
-
 ALTER TABLE public.disciplina OWNER TO ekrumsedfcjcib;
 
---
--- Name: presenca; Type: TABLE; Schema: public; Owner: ekrumsedfcjcib
---
+
 
 CREATE TABLE public.presenca (
     chamada_id uuid NOT NULL,
@@ -107,12 +85,9 @@ CREATE TABLE public.presenca (
     data timestamp without time zone NOT NULL
 );
 
-
 ALTER TABLE public.presenca OWNER TO ekrumsedfcjcib;
 
---
--- Name: turma; Type: TABLE; Schema: public; Owner: ekrumsedfcjcib
---
+
 
 CREATE TABLE public.turma (
     id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
@@ -124,24 +99,18 @@ CREATE TABLE public.turma (
     excluido_em timestamp without time zone
 );
 
-
 ALTER TABLE public.turma OWNER TO ekrumsedfcjcib;
 
---
--- Name: turma_alunos; Type: TABLE; Schema: public; Owner: ekrumsedfcjcib
---
+
 
 CREATE TABLE public.turma_alunos (
     turma_id uuid NOT NULL,
     aluno_id uuid NOT NULL
 );
 
-
 ALTER TABLE public.turma_alunos OWNER TO ekrumsedfcjcib;
 
---
--- Name: users; Type: TABLE; Schema: public; Owner: ekrumsedfcjcib
---
+
 
 CREATE TABLE public.users (
     id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
@@ -150,189 +119,186 @@ CREATE TABLE public.users (
     hash character varying(1024) NOT NULL
 );
 
-
 ALTER TABLE public.users OWNER TO ekrumsedfcjcib;
 
---
--- Name: usuario; Type: TABLE; Schema: public; Owner: ekrumsedfcjcib
---
+
 
 CREATE TABLE public.usuario (
     id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
     nome character varying NOT NULL,
     email character varying NOT NULL,
     senha character varying NOT NULL,
-    tipo public.usuario_tipo_enum DEFAULT 'nenhum'::public.usuario_tipo_enum NOT NULL,
+    tipo public.usuario_tipo_enum NOT NULL,
     criado_em timestamp without time zone DEFAULT now() NOT NULL,
     atualizado_em timestamp without time zone DEFAULT now() NOT NULL,
     excluido_em timestamp without time zone
 );
 
-
 ALTER TABLE public.usuario OWNER TO ekrumsedfcjcib;
 
+
+
 --
--- Name: disciplina PK_disciplina; Type: CONSTRAINT; Schema: public; Owner: ekrumsedfcjcib
+-- CONSTRAINTS - primary keys
 --
 
 ALTER TABLE ONLY public.disciplina
     ADD CONSTRAINT "PK_disciplina" PRIMARY KEY (id);
 
 
---
--- Name: presenca PK_presenca; Type: CONSTRAINT; Schema: public; Owner: ekrumsedfcjcib
---
 
 ALTER TABLE ONLY public.presenca
     ADD CONSTRAINT "PK_presenca" PRIMARY KEY (chamada_id, aluno_id);
 
 
---
--- Name: turma_alunos PK_turma_alunos; Type: CONSTRAINT; Schema: public; Owner: ekrumsedfcjcib
---
 
 ALTER TABLE ONLY public.turma_alunos
     ADD CONSTRAINT "PK_turma_alunos" PRIMARY KEY (turma_id, aluno_id);
 
 
---
--- Name: usuario PK_usuario; Type: CONSTRAINT; Schema: public; Owner: ekrumsedfcjcib
---
 
 ALTER TABLE ONLY public.usuario
     ADD CONSTRAINT "PK_usuario" PRIMARY KEY (id);
 
 
---
--- Name: turma PK_turma; Type: CONSTRAINT; Schema: public; Owner: ekrumsedfcjcib
---
 
 ALTER TABLE ONLY public.turma
     ADD CONSTRAINT "PK_turma" PRIMARY KEY (id);
 
 
---
--- Name: chamada PK_chamada; Type: CONSTRAINT; Schema: public; Owner: ekrumsedfcjcib
---
 
 ALTER TABLE ONLY public.chamada
     ADD CONSTRAINT "PK_chamada" PRIMARY KEY (id);
 
 
---
--- Name: aula PK_aula; Type: CONSTRAINT; Schema: public; Owner: ekrumsedfcjcib
---
 
 ALTER TABLE ONLY public.aula
     ADD CONSTRAINT "PK_aula" PRIMARY KEY (id);
 
 
 --
--- Name: usuario UQ_usuario_email; Type: CONSTRAINT; Schema: public; Owner: ekrumsedfcjcib
+-- CONSTRAINTS - unique keys
 --
 
 ALTER TABLE ONLY public.usuario
     ADD CONSTRAINT "UQ_usuario_email" UNIQUE (email);
 
+
 ALTER TABLE ONLY public.disciplina
     ADD CONSTRAINT "UQ_disciplina_codigo" UNIQUE (codigo);
 
---
--- Name: users users_email_key; Type: CONSTRAINT; Schema: public; Owner: ekrumsedfcjcib
---
 
 ALTER TABLE ONLY public.users
     ADD CONSTRAINT users_email_key UNIQUE (email);
 
-
---
--- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: ekrumsedfcjcib
---
 
 ALTER TABLE ONLY public.users
     ADD CONSTRAINT users_pkey PRIMARY KEY (id);
 
 
 --
--- Name: IDX_79ab8e71b54cd395891ff607dd; Type: INDEX; Schema: public; Owner: ekrumsedfcjcib
+-- INDEXES
 --
 
 CREATE INDEX "IDX_turma_alunos_turma_id" ON public.turma_alunos USING btree (turma_id);
 
 
---
--- Name: IDX_93e5c198a6ee118e43ca6b93be; Type: INDEX; Schema: public; Owner: ekrumsedfcjcib
---
-
 CREATE INDEX "IDX_turma_alunos_aluno_id" ON public.turma_alunos USING btree (aluno_id);
 
 
 --
--- Name: turma FK_046e54fc87131b5c112e4db7889; Type: FK CONSTRAINT; Schema: public; Owner: ekrumsedfcjcib
+-- CONSTRAINTS - foreign keys
 --
 
 ALTER TABLE ONLY public.turma
-    ADD CONSTRAINT "FK_046e54fc87131b5c112e4db7889" FOREIGN KEY (disciplina_id) REFERENCES public.disciplina(id);
-
-
---
--- Name: turma FK_0fc28414637572e39e3d2d6f083; Type: FK CONSTRAINT; Schema: public; Owner: ekrumsedfcjcib
---
+    ADD CONSTRAINT "FK_turma_disciplina_id" FOREIGN KEY (disciplina_id) REFERENCES public.disciplina(id);
 
 ALTER TABLE ONLY public.turma
-    ADD CONSTRAINT "FK_0fc28414637572e39e3d2d6f083" FOREIGN KEY (professor_id) REFERENCES public.usuario(id);
+    ADD CONSTRAINT "FK_turma_professor_id" FOREIGN KEY (professor_id) REFERENCES public.usuario(id);
 
 
---
--- Name: chamada FK_5a8b2ac62497555d162224e0a20; Type: FK CONSTRAINT; Schema: public; Owner: ekrumsedfcjcib
---
 
 ALTER TABLE ONLY public.chamada
-    ADD CONSTRAINT "FK_5a8b2ac62497555d162224e0a20" FOREIGN KEY (aula_id) REFERENCES public.aula(id);
+    ADD CONSTRAINT "FK_chamada_aula_id" FOREIGN KEY (aula_id) REFERENCES public.aula(id);
 
 
---
--- Name: turma_alunos FK_79ab8e71b54cd395891ff607dd8; Type: FK CONSTRAINT; Schema: public; Owner: ekrumsedfcjcib
---
 
 ALTER TABLE ONLY public.turma_alunos
-    ADD CONSTRAINT "FK_79ab8e71b54cd395891ff607dd8" FOREIGN KEY (turma_id) REFERENCES public.turma(id) ON DELETE CASCADE;
-
-
---
--- Name: turma_alunos FK_93e5c198a6ee118e43ca6b93bea; Type: FK CONSTRAINT; Schema: public; Owner: ekrumsedfcjcib
---
+    ADD CONSTRAINT "FK_turma_alunos_turma_id" FOREIGN KEY (turma_id) REFERENCES public.turma(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY public.turma_alunos
-    ADD CONSTRAINT "FK_93e5c198a6ee118e43ca6b93bea" FOREIGN KEY (aluno_id) REFERENCES public.usuario(id) ON DELETE CASCADE;
+    ADD CONSTRAINT "FK_turma_alunos_aluno_id" FOREIGN KEY (aluno_id) REFERENCES public.usuario(id) ON DELETE CASCADE;
 
 
---
--- Name: aula FK_9be5f2ae728b9b2b97363c38a80; Type: FK CONSTRAINT; Schema: public; Owner: ekrumsedfcjcib
---
 
 ALTER TABLE ONLY public.aula
-    ADD CONSTRAINT "FK_9be5f2ae728b9b2b97363c38a80" FOREIGN KEY (turma_id) REFERENCES public.turma(id);
+    ADD CONSTRAINT "FK_aula_turma_id" FOREIGN KEY (turma_id) REFERENCES public.turma(id);
 
 
---
--- Name: presenca FK_b366ab1b8b2c5805f18320c9e8d; Type: FK CONSTRAINT; Schema: public; Owner: ekrumsedfcjcib
---
 
 ALTER TABLE ONLY public.presenca
-    ADD CONSTRAINT "FK_b366ab1b8b2c5805f18320c9e8d" FOREIGN KEY (chamada_id) REFERENCES public.chamada(id);
-
-
---
--- Name: presenca FK_ca6d55f15d0a6508bb9bd933645; Type: FK CONSTRAINT; Schema: public; Owner: ekrumsedfcjcib
---
+    ADD CONSTRAINT "FK_presenca_chamada_id" FOREIGN KEY (chamada_id) REFERENCES public.chamada(id);
 
 ALTER TABLE ONLY public.presenca
-    ADD CONSTRAINT "FK_ca6d55f15d0a6508bb9bd933645" FOREIGN KEY (aluno_id) REFERENCES public.usuario(id);
+    ADD CONSTRAINT "FK_presenca_aluno_id" FOREIGN KEY (aluno_id) REFERENCES public.usuario(id);
+
 
 
 --
--- Name: SCHEMA public; Type: ACL; Schema: -; Owner: ekrumsedfcjcib
+-- VIEWS
+--
+
+CREATE VIEW v_chamada AS
+    SELECT
+        c.id,
+        c.aula_id,
+        c.carencia,
+        a.data,
+        d.codigo || ' - ' || t.descricao AS turma,
+        c.criado_em,
+        c.atualizado_em,
+        c.excluido_em
+    FROM
+        chamada     c
+        JOIN aula           a   ON a.id = c.aula_id
+        JOIN turma          t   ON t.id = a.turma_id
+        JOIN disciplina     d   ON d.id = t.disciplina_id;
+
+
+CREATE VIEW v_presenca AS
+    SELECT vc.aula_id,
+        p.chamada_id,
+        p.aluno_id,
+        p.data,
+        u.nome,
+        d.codigo || ' - ' || t.descricao AS turma,
+    FROM
+        presenca    p
+        JOIN usuario        u   ON u.id = p.aluno_id
+        JOIN chamada        c   ON c.id = p.chamada_id;
+        JOIN aula           a   ON a.id = c.aula_id
+        JOIN turma          t   ON t.id = a.turma_id
+        JOIN disciplina     d   ON d.id = t.disciplina_id;
+
+
+CREATE VIEW v_turma AS
+    SELECT
+        t.id,
+        t.descricao,
+        d.codigo || ' - ' || d.nome AS disciplina,
+        u.nome AS professor,
+        t.criado_em,
+        t.atualizado_em,
+        t.excluido_em
+    FROM
+        turma   t
+        JOIN disciplina     d   ON d.id = t.disciplina_id
+        JOIN usuario        u   ON u.id = t.professor_id;
+
+
+
+--
+-- USER PRIVILEGES
 --
 
 REVOKE ALL ON SCHEMA public FROM postgres;
@@ -340,15 +306,9 @@ REVOKE ALL ON SCHEMA public FROM PUBLIC;
 GRANT ALL ON SCHEMA public TO ekrumsedfcjcib;
 GRANT ALL ON SCHEMA public TO PUBLIC;
 
-
---
--- Name: LANGUAGE plpgsql; Type: ACL; Schema: -; Owner: postgres
---
-
 GRANT ALL ON LANGUAGE plpgsql TO ekrumsedfcjcib;
 
 
 --
--- PostgreSQL database dump complete
+-- END PostgreSQL database configuration 
 --
-
