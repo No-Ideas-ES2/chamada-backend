@@ -1,4 +1,4 @@
-import IBase from "./baseInterface";
+import IBase from './baseInterface'
 
 export enum EnumTipoUsuario {
   ADMIN = 'admin',

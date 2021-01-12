@@ -180,8 +180,8 @@ ALTER TABLE ONLY public.aula
 -- CONSTRAINTS - unique keys
 --
 
-ALTER TABLE ONLY public.usuario
-    ADD CONSTRAINT "UQ_usuario_email" UNIQUE (email);
+CREATE UNIQUE INDEX UQ_usuario_email ON usuario (email)
+    WHERE excluido_em IS NULL;
 
 
 CREATE UNIQUE INDEX UQ_disciplina_codigo ON disciplina (codigo)
@@ -314,6 +314,10 @@ $fn_preenche_data_atualizado$ language plpgsql;
 --
 
 CREATE trigger tr_atualiza_disciplina BEFORE UPDATE ON disciplina
+    FOR EACH ROW execute procedure fn_preenche_data_atualizado();
+
+
+CREATE trigger tr_atualiza_usuario BEFORE UPDATE ON usuario
     FOR EACH ROW execute procedure fn_preenche_data_atualizado();
 
 
