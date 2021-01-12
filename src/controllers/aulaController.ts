@@ -1,5 +1,4 @@
 import { Request, Response } from 'express'
-import { validationResult } from 'express-validator'
 import AulaService from '../services/aulaService'
 
 export default class AulaController {
@@ -17,6 +16,7 @@ export default class AulaController {
 
   static async post(req: Request, res: Response) {
     try {
+      await AulaService.validaAula(req.body)
       const result = await AulaService.post(req.body)
       return res.status(201).json(result)
     } catch (error) {
@@ -29,6 +29,13 @@ export default class AulaController {
   static async put(req: Request, res: Response) {
     try {
       const { id } = req.params
+      const aula = {
+        id,
+        ...req.body
+      }
+      const msg = await AulaService.validaAula(aula)
+      if (msg) res.status(400).json({ error: msg })
+
       const result = await AulaService.update(id, req.body)
       return res.status(200).json(result)
     } catch (error) {
@@ -41,8 +48,8 @@ export default class AulaController {
   static async delete(req: Request, res: Response) {
     try {
       const { id } = req.params
-      const result = await AulaService.delete(id)
-      return res.status(200).json(result)
+      await AulaService.delete(id)
+      return res.sendStatus(200)
     } catch (error) {
       console.error(error)
       const { message } = error

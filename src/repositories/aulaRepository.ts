@@ -1,49 +1,43 @@
-import PostgresClient from "../providers/postgresClient"
+import IAula from '../interfaces/aulaInterface'
+import PostgresClient from '../providers/postgresClient'
 
 export default class AulaRepository {
-  static async findOneById(id: string): Promise<any> {
+  static selectList = 'id, turma, data, duracao, turma_id AS "turmaId", criado_em AS "criadoEm", atualizado_em AS "atualizadoEm"'
+
+  static async findOneById(id: string): Promise<IAula> {
     const sql = `
     SELECT
-      a.id,
-      d.codigo || '-' || t.descricao AS turma,
-      a.data,
-      a.duracao,
-      a.criado_em,
-      a.atualizado_em
+      ${AulaRepository.selectList}
     FROM
-      aula a
-      JOIN turma t ON t.turma_id = a.turma_id
-      JOIN disciplina d ON d.disciplina_id = t.disciplina_id
+      v_aula
     WHERE
-      a.excluido_em IS NULL
-      AND a.id = :id`
+      excluido_em IS NULL
+      AND id = :id`
 
     const result = await PostgresClient.query(sql, { id })
 
     return result.rows[0]
   }
 
-  static async findAll(): Promise<any> {
-    const sql = `
+  static async findAll(turmaId?: string): Promise<IAula[]> {
+    let sql = `
     SELECT
-      a.id,
-      d.codigo || '-' || t.descricao AS turma,
-      a.data,
-      a.duracao,
-      a.criado_em,
-      a.atualizado_em
+      ${AulaRepository.selectList}
     FROM
-      aula a
-      JOIN turma t ON t.turma_id = a.turma_id
-      JOIN disciplina d ON d.disciplina_id = t.disciplina_id
+      v_aula
     WHERE
-      a.excluido_em IS NULL`
+      excluido_em IS NULL`
 
-    const result = await PostgresClient.query(sql)
+    if (turmaId) {
+      sql += `
+      AND turma_id = :turmaId`
+    }
+
+    const result = await PostgresClient.query(sql, { turmaId })
     return result.rows
   }
 
-  static async save(aula: any): Promise<any> {
+  static async save(aula: any): Promise<IAula> {
     const sql = `
     INSERT INTO aula (
       turma_id, data, duracao
@@ -51,13 +45,13 @@ export default class AulaRepository {
     VALUES (
       :turmaId, :data, :duracao
     )
-    RETURNING *`
+    RETURNING id`
 
     const result = await PostgresClient.query(sql, aula)
-    return result.rows[0]
+    return AulaRepository.findOneById(result.rows[0].id)
   }
 
-  static async update(id: string, aula: any): Promise<any> {
+  static async update(id: string, aula: any): Promise<IAula> {
     const values: string[] = []
 
     if (aula.data) {
@@ -70,22 +64,22 @@ export default class AulaRepository {
       id,
       ...aula
     }
+
     const sql = `
     UPDATE aula
-    SET ${values.join(', ')}
-    WHERE id = :id
-    RETURNING *`
+      SET ${values.join(', ')}
+    WHERE id = :id`
 
-    const result = await PostgresClient.query(sql, binds)
-    return result.rows
+    await PostgresClient.query(sql, binds)
+    return AulaRepository.findOneById(id)
   }
 
-  static async delete(id: string): Promise<any> {
+  static async delete(id: string) {
     const sql = `
     UPDATE aula
     SET excluido_em = NOW()
     WHERE id = : id`
 
-    const result = await PostgresClient.query(sql, { id })
+    await PostgresClient.query(sql, { id })
   }
 }
