@@ -313,12 +313,16 @@ $fn_preenche_data_atualizado$ language plpgsql;
 -- TRIGGERS
 --
 
-CREATE trigger tr_atualiza_disciplina BEFORE UPDATE ON disciplina
-    FOR EACH ROW execute procedure fn_preenche_data_atualizado();
+CREATE TRIGGER tr_atualiza_disciplina BEFORE UPDATE ON disciplina
+    FOR EACH ROW EXECUTE PROCEDURE fn_preenche_data_atualizado();
 
 
-CREATE trigger tr_atualiza_usuario BEFORE UPDATE ON usuario
-    FOR EACH ROW execute procedure fn_preenche_data_atualizado();
+CREATE TRIGGER tr_atualiza_usuario BEFORE UPDATE ON usuario
+    FOR EACH ROW EXECUTE PROCEDURE fn_preenche_data_atualizado();
+
+
+CREATE TRIGGER tr_atualiza_turma BEFORE UPDATE ON turma
+    FOR EACH ROW EXECUTE PROCEDURE fn_preenche_data_atualizado();
 
 
 

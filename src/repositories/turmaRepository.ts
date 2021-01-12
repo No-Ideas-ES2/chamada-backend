@@ -1,25 +1,18 @@
 import { ReplaceObject } from 'pg-bind'
+import ITurma from '../interfaces/turmaInterface'
+import IUsuario from '../interfaces/usuarioInterface'
 import PostgresClient from '../providers/postgresClient'
 import UsuarioRepository from './usuarioRepository'
 
 export default class TurmaRepository {
-  static selectList = ['id', 'descricao', 'codigo', 'tipo', 'criado_em', 'atualizado_em', 'excluido_em']
+  static selectList = 'id, descricao, disciplina, professor, criado_em AS "criadoEm", atualizado_em AS "atualizadoEm"'
 
-  static async findOneById(id: string) {
+  static async findOneById(id: string): Promise<ITurma> {
     const sql = `
     SELECT
-      t.id,
-      t.descricao,
-      d.codigo ||
-      ' - ' ||
-      d.nome  AS  disciplina,
-      u.nome  AS  professor,
-      t.criado_em,
-      t.atualizado_em
+      ${TurmaRepository.selectList}
     FROM
-      turma   t
-      JOIN disciplina   d ON d.id = t.disciplina_id
-      JOIN usuario      u ON u.id = y.professor_id
+      v_turma
     WHERE
       excluido_em IS NULL
       AND id = :id`
@@ -27,34 +20,22 @@ export default class TurmaRepository {
     const binds = { id }
 
     const result = await PostgresClient.query(sql, binds)
-
-    if (result.rowCount > 0)
-      return result.rows[0]
-    return undefined
+    return result.rows[0]
   }
 
-  static async findAll() {
+  static async findAll(): Promise<ITurma[]> {
     const sql = `
     SELECT
-      t.id,
-      t.descricao,
-      d.codigo ||
-      ' - ' ||
-      d.nome  AS  disciplina,
-      u.nome  AS  professor,
-      t.criado_em,
-      t.atualizado_em
+      ${TurmaRepository.selectList}
     FROM
-      turma   t
-      JOIN disciplina   d ON d.id = t.disciplina_id
-      JOIN usuario      u ON u.id = y.professor_id
+      v_turma
     WHERE
       excluido_em IS NULL`
     const result = await PostgresClient.query(sql)
     return result.rows
   }
 
-  static async save(turma: any) {
+  static async save(turma: any): Promise<ITurma> {
     const sql = `
     INSERT INTO 
       turma (
@@ -67,12 +48,12 @@ export default class TurmaRepository {
       :professorId,
       :descricao
     )
-    RETURNING *`
+    RETURNING id`
     const result = await PostgresClient.query(sql, turma)
-    return result.rows[0]
+    return TurmaRepository.findOneById(result.rows[0].id)
   }
 
-  static async update(id: string, turma: any) {
+  static async update(id: string, turma: any): Promise<ITurma> {
     const values: string[] = []
 
     if (turma.descricao) {
@@ -87,26 +68,25 @@ export default class TurmaRepository {
     }
     const sql = `
     UPDATE
-    turma
+      turma
     SET ${values.join(', ')}
-    WHERE id = :id`
+      WHERE id = :id`
 
-    const result = await PostgresClient.query(sql, binds)
-    return result.rows
+    await PostgresClient.query(sql, binds)
+    return TurmaRepository.findOneById(id)
   }
 
   static async delete(id: string) {
     const sql = `
     UPDATE
-    turma
+      turma
     SET excluido_em = NOW()
-    WHERE id = : id`
+      WHERE id = : id`
 
-    const result = await PostgresClient.query(sql, { id })
-    return result
+    await PostgresClient.query(sql, { id })
   }
 
-  static async addAlunos(turmaId: string, alunosId: string[]) {
+  static async addAlunos(turmaId: string, alunosId: string[]): Promise<IUsuario[]> {
     const sql = `
     INSERT INTO
       turma_alunos (
@@ -124,27 +104,21 @@ export default class TurmaRepository {
       alunoId
     }))
 
-    const result = await PostgresClient.query(sql, binds)
-    return result.rows
+    await PostgresClient.query(sql, binds)
+    return TurmaRepository.findAlunos(turmaId)
   }
 
-  static async findAlunos(turmaId: string) {
+  static async findAlunos(turmaId: string): Promise<IUsuario[]> {
     const sql = `
     SELECT
-      ${UsuarioRepository.selectList.join(',')}
+      ${UsuarioRepository.selectList}
     FROM 
       usuario
+      JOIN turma_alunos ta ON id = aluno_id
     WHERE
       excluido_em IS NULL
-      AND usuario_id IN (
-        SELECT
-          aluno_id
-        FROM
-          turma_alunos
-        WHERE
-          turma_id = :turmaId
-      )
-    `
+      AND turma_id = :turmaId`
+
     const result = await PostgresClient.query(sql, { turmaId })
     return result.rows
   }

@@ -26,8 +26,8 @@ export default class TurmaController {
       if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() })
       }
-      await TurmaService.post(req.body)
-      return res.status(201)
+      const turma = await TurmaService.post(req.body)
+      return res.status(201).json(turma)
     } catch (error) {
       console.error(error)
       const { message } = error
@@ -42,8 +42,8 @@ export default class TurmaController {
         return res.status(400).json({ errors: errors.array() })
       }
       const id = req.params.id as string
-      await TurmaService.update(id, req.body)
-      return res.status(200)
+      const turma = await TurmaService.update(id, req.body)
+      return res.status(200).json(turma)
     } catch (error) {
       console.error(error)
       const { message } = error
@@ -59,7 +59,7 @@ export default class TurmaController {
       }
       const id = req.params.id as string
       await TurmaService.delete(id)
-      return res.status(200)
+      return res.sendStatus(200)
     } catch (error) {
       console.error(error)
       const { message } = error
@@ -75,8 +75,8 @@ export default class TurmaController {
       }
       const id = req.params.id as string
       const alunosId: string[] = req.body.alunosId
-      await TurmaService.postAlunos(id, alunosId)
-      return res.status(201)
+      const alunos = await TurmaService.postAlunos(id, alunosId)
+      return res.status(201).json(alunos)
     } catch (error) {
       console.error(error)
       const { message } = error

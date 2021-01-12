@@ -1,9 +1,7 @@
-import IBase from "./baseInterface";
-import IDisciplina from "./disciplinaInterface";
-import IUsuario from "./usuarioInterface";
+import IBase from './baseInterface'
 
 export default interface ITurma extends IBase {
   descricao: string
-  disciplinaId: string
-  professorId: string
+  disciplina: string
+  professor: string
 }
