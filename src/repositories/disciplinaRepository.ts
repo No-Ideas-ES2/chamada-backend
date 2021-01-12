@@ -1,12 +1,13 @@
+import IDisciplina from '../interfaces/disciplinaInterface'
 import PostgresClient from '../providers/postgresClient'
 
 export default class DisciplinaRepository {
-  static selectList = ['id', 'codigo', 'nome', 'criado_em', 'atualizado_em', 'excluido_em']
+  static selectList = 'id, codigo, nome, criado_em AS "criadoEm", atualizado_em AS "atualizadoEm"'
 
-  static async findOneById(id: string) {
+  static async findOneById(id: string): Promise<IDisciplina> {
     const sql = `
     SELECT
-      ${DisciplinaRepository.selectList.join(',')}
+      ${DisciplinaRepository.selectList}
     FROM
       disciplina
     WHERE
@@ -17,15 +18,14 @@ export default class DisciplinaRepository {
 
     const result = await PostgresClient.query(sql, binds)
 
-    if (result.rowCount > 0)
-      return result.rows
-    return undefined
+    return result.rows[0]
+
   }
 
-  static async findAll() {
+  static async findAll(): Promise<IDisciplina[]> {
     const sql = `
     SELECT
-      ${DisciplinaRepository.selectList.join(',')}
+      ${DisciplinaRepository.selectList}
     FROM
       disciplina
     WHERE
@@ -34,7 +34,7 @@ export default class DisciplinaRepository {
     return result.rows
   }
 
-  static async save(disciplina: any) {
+  static async save(disciplina: any): Promise<IDisciplina> {
     const sql = `
     INSERT INTO 
       disciplina (
@@ -43,12 +43,12 @@ export default class DisciplinaRepository {
     VALUES (
       :codigo, :nome
     )
-    RETURNING *`
+    RETURNING id`
     const result = await PostgresClient.query(sql, disciplina)
-    return result.rows[0]
+    return DisciplinaRepository.findOneById(result.rows[0].id)
   }
 
-  static async update(id: string, disciplina: any) {
+  static async update(id: string, disciplina: any): Promise<IDisciplina> {
     const values: string[] = []
 
     if (disciplina.codigo) {
@@ -67,18 +67,17 @@ export default class DisciplinaRepository {
     SET ${values.join(', ')}
     WHERE id = :id`
 
-    const result = await PostgresClient.query(sql, binds)
-    return result.rows
+    await PostgresClient.query(sql, binds)
+    return await DisciplinaRepository.findOneById(id)
   }
 
-  static async delete(id: string) {
+  static async delete(id: string): Promise<void> {
     const sql = `
     UPDATE
       disciplina
     SET excluido_em = NOW()
     WHERE id = :id`
 
-    const result = await PostgresClient.query(sql, { id })
-    return result
+    await PostgresClient.query(sql, { id })
   }
 }

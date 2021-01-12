@@ -184,8 +184,8 @@ ALTER TABLE ONLY public.usuario
     ADD CONSTRAINT "UQ_usuario_email" UNIQUE (email);
 
 
-ALTER TABLE ONLY public.disciplina
-    ADD CONSTRAINT "UQ_disciplina_codigo" UNIQUE (codigo);
+CREATE UNIQUE INDEX UQ_disciplina_codigo ON disciplina (codigo)
+    WHERE excluido_em IS NULL;
 
 
 ALTER TABLE ONLY public.users
@@ -294,6 +294,27 @@ CREATE VIEW v_turma AS
         turma   t
         JOIN disciplina     d   ON d.id = t.disciplina_id
         JOIN usuario        u   ON u.id = t.professor_id;
+
+
+--
+-- FUNCTIONS
+--
+
+CREATE FUNCTION fn_preenche_data_atualizado() RETURNS TRIGGER AS $fn_preenche_data_atualizado$
+    BEGIN
+        NEW.atualizado_em = now();
+        RETURN new;
+    END;
+$fn_preenche_data_atualizado$ language plpgsql;
+
+
+
+--
+-- TRIGGERS
+--
+
+CREATE trigger tr_atualiza_disciplina BEFORE UPDATE ON disciplina
+    FOR EACH ROW execute procedure fn_preenche_data_atualizado();
 
 
 

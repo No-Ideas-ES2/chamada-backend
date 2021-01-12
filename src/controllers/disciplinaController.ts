@@ -26,8 +26,8 @@ export default class DisciplinaController {
       if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() })
       }
-      await DisciplinaService.post(req.body)
-      return res.status(201)
+      const disciplina = await DisciplinaService.post(req.body)
+      return res.status(201).json(disciplina)
     } catch (error) {
       console.error(error)
       const { message } = error
@@ -41,9 +41,9 @@ export default class DisciplinaController {
       if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() })
       }
-      const id = req.params.id as string
-      await DisciplinaService.update(id, req.body)
-      return res.status(200)
+      const { id } = req.params
+      const disciplina = await DisciplinaService.update(id, req.body)
+      return res.status(200).json(disciplina)
     } catch (error) {
       console.error(error)
       const { message } = error
@@ -57,9 +57,9 @@ export default class DisciplinaController {
       if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() })
       }
-      const id = req.params.id as string
+      const { id } = req.params
       await DisciplinaService.delete(id)
-      return res.status(200)
+      return res.sendStatus(200)
     } catch (error) {
       console.error(error)
       const { message } = error

@@ -1,4 +1,4 @@
-import IBase from "./baseInterface";
+import IBase from './baseInterface'
 
 export default interface IDisciplina extends IBase {
   codigo: string
