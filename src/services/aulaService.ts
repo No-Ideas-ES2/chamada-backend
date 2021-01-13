@@ -24,26 +24,24 @@ export default class AulaService {
     return AulaRepository.delete(id)
   }
 
-  static async validaAula(nAula: { id?: string, turmaId: string, data: Date, duracao: number }): Promise<string | undefined> {
+  static async validaAula(nAula: IAula): Promise<string | undefined> {
     if (nAula.id) {
       const aula = await AulaRepository.findOneById(nAula.id)
+      if (!aula) return 'Aula não existe!'
 
-      if (!nAula.data) nAula.data = aula.data
-      if (!nAula.duracao) nAula.duracao = aula.duracao
-      if (!nAula.turmaId) nAula.turmaId = aula.turmaId
+      if (nAula.data) aula.inicio = nAula.data
+      if (nAula.duracao) aula.duracao = nAula.duracao
+      if (nAula.turmaId) aula.turmaId = nAula.turmaId
+
+      nAula = aula
     }
 
-    const nInicio = nAula.data.getTime()
-    const nFinal = Utils.addMinutos(nAula.data, nAula.duracao).getTime()
+    nAula.final = Utils.addMinutos(nAula.inicio, nAula.duracao)
 
     const aulas = (await AulaRepository.findAll(nAula.turmaId))
       .filter((aula) => {
-        const inicio = aula.data.getTime()
-        const final = Utils.addMinutos(aula.data, aula.duracao).getTime()
-
-        return (nAula.id !== aula.id) && (
-          (inicio >= nInicio && inicio <= nFinal) || (final >= nInicio && final <= nFinal)
-        )
+        return (nAula.id !== aula.id) &&
+          Utils.datasDobrepostas(nAula.inicio, nAula.final, aula.inicio, aula.final)
       })
 
     if (aulas.length > 0) {

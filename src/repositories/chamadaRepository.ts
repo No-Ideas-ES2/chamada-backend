@@ -1,16 +1,22 @@
-import PostgresClient from "../providers/postgresClient"
+import IChamada from '../interfaces/chamadaInterface'
+import PostgresClient from '../providers/postgresClient'
 
 export default class ChamadaRepository {
-  static async findOneById(id: string): Promise<any> {
+  static selectList = `
+    id,
+    inicio,
+    final,
+    carencia,
+    turma,
+    turma_id AS "turmaId",
+    aula_id AS "aulaId",
+    criado_em AS "criadoEm",
+    atualizado_em "atualizadoEm"`
+
+  static async findOneById(id: string): Promise<IChamada> {
     const sql = `
     SELECT 
-      id,
-      aula_id
-      data,
-      carencia,
-      turma,
-      criado_em,
-      atualizado_em
+      ${ChamadaRepository.selectList}
     FROM
       v_chamada
     WHERE
@@ -22,45 +28,46 @@ export default class ChamadaRepository {
     return result.rows[0]
   }
 
-  static async findAll(): Promise<any> {
-    const sql = `
+  static async findAll(aulaId?: string): Promise<IChamada[]> {
+    let sql = `
     SELECT 
-      id,
-      aula_id
-      data,
-      carencia,
-      turma,
-      criado_em,
-      atualizado_em
+      ${ChamadaRepository.selectList}
     FROM
       v_chamada
     WHERE
-      excluido_em IS NULL
-    `
+      excluido_em IS NULL`
 
-    const result = await PostgresClient.query(sql)
-    return result.rows[0]
+    if (aulaId) {
+      sql += `
+      AND aula_id = :aulaId`
+    }
+
+    const result = await PostgresClient.query(sql, { aulaId })
+    return result.rows
   }
 
-  static async save(chamada: any): Promise<any> {
+  static async save(chamada: any): Promise<IChamada> {
     const sql = `
     INSERT INTO chamada (
-      aula_id, carencia
+      aula_id, carencia, hora
     )
     VALUES (
-      :aulaId, :carencia
+      :aulaId, :carencia, :hora
     )
-    RETURNNING *`
+    RETURNING id`
 
     const result = await PostgresClient.query(sql, chamada)
-    return result.rows[0]
+    return ChamadaRepository.findOneById(result.rows[0].id)
   }
 
-  static async update(id: string, chamada: any): Promise<any> {
+  static async update(id: string, chamada: any): Promise<IChamada> {
     const values: string[] = []
 
     if (chamada.carencia) {
       values.push('carencia = :carencia')
+    }
+    if (chamada.hora) {
+      values.push('hora = :hora')
     }
 
     const binds = {
@@ -71,20 +78,18 @@ export default class ChamadaRepository {
     const sql = `
     UPDATE chamada
     SET ${values.join(', ')}
-    WHERE id = :id
-    RETURNIG *`
+    WHERE id = :id`
 
-    const result = await PostgresClient.query(sql, binds)
-    return result.rows[0]
+    await PostgresClient.query(sql, binds)
+    return ChamadaRepository.findOneById(id)
   }
 
-  static async delete(id: string): Promise<any> {
+  static async delete(id: string) {
     const sql = `
     UPDATE chamada
     SET excluido_em = NOW()
     WHERE id = :id`
 
-    const result = await PostgresClient.query(sql)
-    return result.rows[0]
+    await PostgresClient.query(sql, { id })
   }
 }

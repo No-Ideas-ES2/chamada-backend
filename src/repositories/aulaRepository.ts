@@ -2,7 +2,7 @@ import IAula from '../interfaces/aulaInterface'
 import PostgresClient from '../providers/postgresClient'
 
 export default class AulaRepository {
-  static selectList = 'id, turma, data, duracao, turma_id AS "turmaId", criado_em AS "criadoEm", atualizado_em AS "atualizadoEm"'
+  static selectList = 'id, turma, inicio, final, duracao, turma_id AS "turmaId", criado_em AS "criadoEm", atualizado_em AS "atualizadoEm"'
 
   static async findOneById(id: string): Promise<IAula> {
     const sql = `

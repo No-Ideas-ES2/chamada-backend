@@ -16,7 +16,9 @@ export default class AulaController {
 
   static async post(req: Request, res: Response) {
     try {
-      await AulaService.validaAula(req.body)
+      const msg = await AulaService.validaAula(req.body)
+      if (msg) res.status(400).json({ error: msg })
+
       const result = await AulaService.post(req.body)
       return res.status(201).json(result)
     } catch (error) {
