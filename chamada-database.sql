@@ -56,6 +56,7 @@ ALTER TABLE public.aula OWNER TO ekrumsedfcjcib;
 CREATE TABLE public.chamada (
     id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
     aula_id uuid,
+    hora time NOT NULL,
     carencia integer NOT NULL,
     criado_em timestamp without time zone DEFAULT now() NOT NULL,
     atualizado_em timestamp without time zone DEFAULT now() NOT NULL,
@@ -253,32 +254,35 @@ CREATE VIEW v_chamada AS
         c.id,
         c.aula_id,
         c.carencia,
-        a.data,
+        date_trunc('day', a.data) + c.hora AS inicio,
+        (date_trunc('day', a.data) + c.hora) + make_time(0, c.carencia, 0) AS final,
+        t.id AS turma_id,
         d.codigo || ' - ' || t.descricao AS turma,
         c.criado_em,
         c.atualizado_em,
         c.excluido_em
     FROM
         chamada     c
-        JOIN aula           a   ON a.id = c.aula_id
-        JOIN turma          t   ON t.id = a.turma_id
-        JOIN disciplina     d   ON d.id = t.disciplina_id;
+        JOIN aula           a ON a.id = c.aula_id
+        JOIN turma          t ON t.id = a.turma_id
+        JOIN disciplina     d ON d.id = t.disciplina_id;
 
 
 CREATE VIEW v_presenca AS
-    SELECT vc.aula_id,
+    SELECT 
+        c.aula_id,
         p.chamada_id,
         p.aluno_id,
         p.data,
-        u.nome,
-        d.codigo || ' - ' || t.descricao AS turma,
+        u.nome AS aluno,
+        d.codigo || ' - ' || t.descricao AS turma
     FROM
         presenca    p
-        JOIN usuario        u   ON u.id = p.aluno_id
-        JOIN chamada        c   ON c.id = p.chamada_id;
-        JOIN aula           a   ON a.id = c.aula_id
-        JOIN turma          t   ON t.id = a.turma_id
-        JOIN disciplina     d   ON d.id = t.disciplina_id;
+        JOIN usuario        u ON u.id = p.aluno_id
+        JOIN chamada        c ON c.id = p.chamada_id
+        JOIN aula           a ON a.id = c.aula_id
+        JOIN turma          t ON t.id = a.turma_id
+        JOIN disciplina     d ON d.id = t.disciplina_id;
 
 
 CREATE VIEW v_turma AS
@@ -292,9 +296,26 @@ CREATE VIEW v_turma AS
         t.excluido_em
     FROM
         turma   t
-        JOIN disciplina     d   ON d.id = t.disciplina_id
-        JOIN usuario        u   ON u.id = t.professor_id;
+        JOIN disciplina     d ON d.id = t.disciplina_id
+        JOIN usuario        u ON u.id = t.professor_id;
 
+
+CREATE VIEW v_aula as
+    SELECT
+        a.id,
+        t.id AS turma_id,
+        (d.codigo::text || '-'::text) || t.descricao::text AS turma,
+        d.id AS disciplina_id,
+        date_trunc('day', a.data) AS inicio,
+        date_trunc('day', a.data) + make_time(0, a.duracao, 0) AS final,
+        a.duracao,
+        a.criado_em,
+        a.atualizado_em,
+        a.excluido_em
+    FROM
+        aula a
+        JOIN turma      t ON t.id = a.turma_id
+        JOIN disciplina d ON d.id = t.disciplina_id;
 
 --
 -- FUNCTIONS
@@ -324,6 +345,9 @@ CREATE TRIGGER tr_atualiza_usuario BEFORE UPDATE ON usuario
 CREATE TRIGGER tr_atualiza_turma BEFORE UPDATE ON turma
     FOR EACH ROW EXECUTE PROCEDURE fn_preenche_data_atualizado();
 
+
+CREATE TRIGGER tr_atualiza_aula BEFORE UPDATE ON aula
+    FOR EACH ROW EXECUTE PROCEDURE fn_preenche_data_atualizado();
 
 
 --

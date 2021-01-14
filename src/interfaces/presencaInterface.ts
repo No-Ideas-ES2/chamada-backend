@@ -1,5 +1,8 @@
 export default interface IPresenca {
-  data: Date
+  aulaId: string
   chamadaId: string
   alunoId: string
+  data: Date
+  aluno: string
+  turma: string
 }

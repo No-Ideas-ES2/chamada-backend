@@ -1,71 +1,63 @@
-import PostgresClient from "../providers/postgresClient"
+import IPresenca from '../interfaces/presencaInterface'
+import PostgresClient from '../providers/postgresClient'
 
 export default class PresencaRepository {
-  static async findByUser(alunoId: string): Promise<any> {
+  static selectList = `
+  aula_id AS "aulaId",
+  chamada_id AS "chamadaId",
+  aluno_id AS "alunoId",
+  data,
+  aluno,
+  turma`
+
+  static async findByAluno(alunoId: string): Promise<IPresenca[]> {
     const sql = `
     SELECT
-      aula_id,
-      chamada_id,
-      aluno_id,
-      data,
-      nome,
-      turma
+      ${PresencaRepository.selectList}
     FROM
       v_presenca
     WHERE
       aluno_id = :alunoId`
 
     const result = await PostgresClient.query(sql, { alunoId })
-    return result.rows[0]
+    return result.rows
   }
 
-  static async findByCall(chamadaId: string): Promise<any> {
+  static async findByChamada(chamadaId: string): Promise<IPresenca[]> {
     const sql = `
     SELECT
-      aula_id,
-      chamada_id,
-      aluno_id,
-      data,
-      nome,
-      turma
+      ${PresencaRepository.selectList}
     FROM
       v_presenca
     WHERE
       chamada_id = :chamadaId`
 
     const result = await PostgresClient.query(sql, { chamadaId })
-    return result.rows[0]
+    return result.rows
   }
 
-  static async findByClass(aulaId: string): Promise<any> {
+  static async findByAula(aulaId: string): Promise<IPresenca[]> {
     const sql = `
     SELECT
-      aula_id,
-      chamada_id,
-      aluno_id,
-      data,
-      nome,
-      turma
+      ${PresencaRepository.selectList}
     FROM
       v_presenca
     WHERE
       aula_id = :aulaId`
 
     const result = await PostgresClient.query(sql, { aulaId })
-    return result.rows[0]
+    return result.rows
   }
 
-  static async save(presenca: any): Promise<any> {
+  static async save(presenca: any) {
     const sql = `
     INSERT INTO presenca (
       chamada_id, aluno_id, data
     )
     VALUES (
-      :chamadaId, :alunoId, :data
+      :chamadaId, :alunoId, NOW()
     )`
 
-    const result = await PostgresClient.query(sql, presenca)
-    return result.rows[0]
-
+    await PostgresClient.query(sql, presenca)
   }
 }

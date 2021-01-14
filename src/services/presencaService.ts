@@ -1,21 +1,22 @@
-import PresencaRepository from "../repositories/presencaRepository";
+import IPresenca from '../interfaces/presencaInterface'
+import PresencaRepository from '../repositories/presencaRepository'
 
 export default class PresencaService {
 
-  static async getAllByAluno(alunoId: string): Promise<any> {
-    return PresencaRepository.findByUser(alunoId)
+  static async getAllByAluno(alunoId: string): Promise<IPresenca[]> {
+    return PresencaRepository.findByAluno(alunoId)
   }
 
-  static async getAllByChamada(chamadaId: string): Promise<any> {
-    return PresencaRepository.findByCall(chamadaId)
+  static async getAllByChamada(chamadaId: string): Promise<IPresenca[]> {
+    return PresencaRepository.findByChamada(chamadaId)
   }
 
-  static async getAllByAula(aulaId: string): Promise<any> {
-    return PresencaRepository.findByClass(aulaId)
+  static async getAllByAula(aulaId: string): Promise<IPresenca[]> {
+    return PresencaRepository.findByAula(aulaId)
   }
 
-  static async save(presenca: any): Promise<any> {
-    return PresencaRepository.save(presenca)
+  static async save(presenca: any) {
+    await PresencaRepository.save(presenca)
   }
 
 }

@@ -7,7 +7,7 @@ import CommonValidation from '../validations/commonValidation'
 
 const routes = Router()
 
-routes.get('/:id/presencas', CommonValidation.id, PresencaController.getAllByChamada)
+routes.get('/:id/presenca', CommonValidation.id, PresencaController.getAllByChamada)
 
 routes.get('/:id?', CommonValidation.idOptional, Validator, ChamadaController.get)
 routes.post('/', ChamadaValidation.insert, Validator, ChamadaController.post)

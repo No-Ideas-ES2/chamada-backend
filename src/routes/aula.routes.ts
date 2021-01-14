@@ -7,7 +7,7 @@ import Validator from '../middlewares/validatorMiddleware'
 
 const routes = Router()
 
-routes.get('/:id/presencas', CommonValidation.id, PresencaController.getAllByAula)
+routes.get('/:id/presenca', CommonValidation.id, PresencaController.getAllByAula)
 
 routes.get('/:id?', CommonValidation.idOptional, Validator, AulaController.get)
 routes.post('/', AulaValidation.insert, Validator, AulaController.post)

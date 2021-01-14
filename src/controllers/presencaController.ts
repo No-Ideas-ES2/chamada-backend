@@ -4,8 +4,8 @@ import PresencaService from '../services/presencaService'
 export default class PresencaController {
   static async getAllByAluno(req: Request, res: Response) {
     try {
-      const { alunoId } = req.params
-      const result = await PresencaService.getAllByAluno(alunoId)
+      const { id } = req.params
+      const result = await PresencaService.getAllByAluno(id)
       return res.status(200).json(result)
     } catch (error) {
       console.error(error)
@@ -16,8 +16,8 @@ export default class PresencaController {
 
   static async getAllByAula(req: Request, res: Response) {
     try {
-      const { aulaId } = req.params
-      const result = await PresencaService.getAllByAula(aulaId)
+      const { id } = req.params
+      const result = await PresencaService.getAllByAula(id)
       return res.status(200).json(result)
     } catch (error) {
       console.error(error)
@@ -28,8 +28,8 @@ export default class PresencaController {
 
   static async getAllByChamada(req: Request, res: Response) {
     try {
-      const { chamadaId } = req.params
-      const result = await PresencaService.getAllByChamada(chamadaId)
+      const { id } = req.params
+      const result = await PresencaService.getAllByChamada(id)
       return res.status(200).json(result)
     } catch (error) {
       console.error(error)
@@ -38,5 +38,14 @@ export default class PresencaController {
     }
   }
 
-  static async save(req: Request, res: Response) { }
+  static async save(req: Request, res: Response) {
+    try {
+      await PresencaService.save(req.body)
+      return res.sendStatus(201)
+    } catch (error) {
+      console.error(error)
+      const { message } = error
+      return res.status(500).json({ error: message })
+    }
+  }
 }
