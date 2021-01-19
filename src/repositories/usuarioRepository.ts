@@ -1,12 +1,13 @@
-import PostgresClient from '../database/postgresClient'
+import IUsuario from '../interfaces/usuarioInterface'
+import PostgresClient from '../providers/postgresClient'
 
-export default class UsuarioModel {
-  static selectList = ['id', 'nome', 'email', 'tipo', 'criado_em', 'atualizado_em', 'excluido_em']
+export default class UsuarioRepository {
+  static selectList = 'id, nome, email, tipo, criado_em AS "criadoEm", atualizado_em AS "atualizadoEm"'
 
-  static async findOneById(id: string) {
+  static async findOneById(id: string): Promise<IUsuario> {
     const sql = `
     SELECT
-      ${UsuarioModel.selectList.join(',')}
+      ${UsuarioRepository.selectList}
     FROM
       usuario
     WHERE
@@ -14,31 +15,27 @@ export default class UsuarioModel {
       AND id = :id`
 
     const result = await PostgresClient.query(sql, { id })
-    if (result.rowCount > 0)
-      return result.rows[0]
-    return undefined
+    return result.rows[0]
   }
 
-  static async findOneByEmail(email: string) {
+  static async findOneByEmail(email: string): Promise<IUsuario> {
     const sql = `
     SELECT
-      ${UsuarioModel.selectList.join(',')}
+      ${UsuarioRepository.selectList}
     FROM
       usuario
     WHERE
       excluido_em IS NULL
-      AND email = :id`
+      AND email = :email`
 
     const result = await PostgresClient.query(sql, { email })
-    if (result.rowCount > 0)
-      return result.rows[0]
-    return undefined
+    return result.rows[0]
   }
 
-  static async findAll(tipo?: string) {
+  static async findAll(tipo?: string): Promise<IUsuario[]> {
     let sql = `
-    SSELECT
-      ${UsuarioModel.selectList.join(',')}
+    SELECT
+      ${UsuarioRepository.selectList}
     FROM
       usuario
     WHERE
@@ -53,7 +50,7 @@ export default class UsuarioModel {
     return result.rows
   }
 
-  static async save(usuario: any) {
+  static async save(usuario: any): Promise<IUsuario> {
     const sql = `
     INSERT INTO 
       usuario (
@@ -61,13 +58,14 @@ export default class UsuarioModel {
       )
     VALUES (
       :nome, :email, :senha, :tipo
-    )`
+    )
+    RETURNING id`
 
     const result = await PostgresClient.query(sql, usuario)
-    return result.rows
+    return UsuarioRepository.findOneById(result.rows[0].id)
   }
 
-  static async update(id: string, usuario: any) {
+  static async update(id: string, usuario: any): Promise<IUsuario> {
     const values: string[] = []
 
     if (usuario.nome) {
@@ -91,8 +89,8 @@ export default class UsuarioModel {
     SET ${values.join(', ')}
     WHERE id = :id`
 
-    const result = await PostgresClient.query(sql, binds)
-    return result.rows
+    await PostgresClient.query(sql, binds)
+    return UsuarioRepository.findOneById(id)
   }
 
   static async delete(id: string) {
@@ -100,9 +98,8 @@ export default class UsuarioModel {
     UPDATE
       usuario
     SET excluido_em = NOW()
-    WHERE id = :id`
+      WHERE id = :id`
 
-    const result = await PostgresClient.query(sql, { id })
-    return result
+    await PostgresClient.query(sql, { id })
   }
 }

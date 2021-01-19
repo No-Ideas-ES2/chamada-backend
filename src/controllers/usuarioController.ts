@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 import { validationResult } from 'express-validator'
-import UsuarioService from './usuarioService'
+import UsuarioService from '../services/usuarioService'
 
 export default class UsuarioController {
   static async get(req: Request, res: Response) {
@@ -25,8 +25,8 @@ export default class UsuarioController {
       if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() })
       }
-      await UsuarioService.post(req.body)
-      return res.status(201)
+      const usuario = await UsuarioService.post(req.body)
+      return res.status(201).json(usuario)
     } catch (error) {
       console.error(error)
       const { message } = error
@@ -41,8 +41,8 @@ export default class UsuarioController {
         return res.status(400).json({ errors: errors.array() })
       }
       const id = req.params.id as string
-      await UsuarioService.update(id, req.body)
-      return res.status(200)
+      const usuario = await UsuarioService.update(id, req.body)
+      return res.status(200).json(usuario)
     } catch (error) {
       console.error(error)
       const { message } = error
