@@ -1,7 +1,7 @@
 import { Pool } from 'pg'
 import bind, { BindInfo, ReplaceObject } from 'pg-bind'
 
-import databaseConfig from '../config/databaseConfig'
+import config from '../config'
 
 export default class PostgresClient {
 
@@ -26,6 +26,6 @@ export default class PostgresClient {
   }
 
   private static getPool() {
-    return new Pool(databaseConfig)
+    return new Pool(config.database)
   }
 }

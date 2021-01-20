@@ -18,7 +18,7 @@ export default class UsuarioRepository {
     return result.rows[0]
   }
 
-  static async findOneByEmail(email: string): Promise<IUsuario> {
+  static async findOneByEmailSenha(email: string, senha: string): Promise<IUsuario> {
     const sql = `
     SELECT
       ${UsuarioRepository.selectList}
@@ -26,9 +26,10 @@ export default class UsuarioRepository {
       usuario
     WHERE
       excluido_em IS NULL
-      AND email = :email`
+      AND email = :email
+      AND senha = :senha`
 
-    const result = await PostgresClient.query(sql, { email })
+    const result = await PostgresClient.query(sql, { email, senha })
     return result.rows[0]
   }
 
