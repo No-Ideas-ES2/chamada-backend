@@ -1,4 +1,5 @@
 import { Router } from 'express'
+import { authorizeUser } from '../auth/authorization'
 import PresencaController from '../controllers/presencaController'
 import UsuarioController from '../controllers/usuarioController'
 import CommonValidation from '../validations/commonValidation'
@@ -8,9 +9,9 @@ const router = Router()
 
 router.post('/:id/presenca', CommonValidation.id, PresencaController.getAllByAluno)
 
-router.post('/', UsuarioValidation.insert, UsuarioController.post)
-router.get('/:id*?', CommonValidation.idOptional, UsuarioController.get)
-router.put('/:id', UsuarioValidation.update, UsuarioController.put)
-router.delete('/:id', CommonValidation.id, UsuarioController.delete)
+router.post('/', authorizeUser(['admin']), UsuarioValidation.insert, UsuarioController.post)
+router.get('/:id*?', authorizeUser(['admin']), CommonValidation.idOptional, UsuarioController.get)
+router.put('/:id', authorizeUser(['admin']), UsuarioValidation.update, UsuarioController.put)
+router.delete('/:id', authorizeUser(['admin']), CommonValidation.id, UsuarioController.delete)
 
 export default router
