@@ -12,7 +12,9 @@ O presente trabalho tem o objetivo de criar uma chamada automatizada com o intui
 
 Veja também a [aplicação Web](https://github.com/No-Ideas-ES2/Chamada-Automatica)!
 
-## Como Testar ##
+Documentação [Swagger/OpenAPI](https://app.swaggerhub.com/apis-docs/TADebastianiOrg/Call_API/1.1.0)
+
+## Rodando a aplicação ##
 
 ### Pré-requisitos ###
 
