@@ -10,8 +10,9 @@ export default class AulaValidation {
 
   static update = [
     ...CommonValidation.id,
-    oneOf(
-      AulaValidation.insert
-    )
+    oneOf([
+      AulaValidation.insert[1],
+      AulaValidation.insert[2]
+    ])
   ]
 }

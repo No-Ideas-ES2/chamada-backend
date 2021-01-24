@@ -1,4 +1,5 @@
 import { Request, Response } from 'express'
+import TurmaRepository from '../repositories/turmaRepository'
 import AulaService from '../services/aulaService'
 
 export default class AulaController {
@@ -18,6 +19,12 @@ export default class AulaController {
     try {
       const msg = await AulaService.validaAula(req.body)
       if (msg) res.status(400).json({ error: msg })
+
+      const { turmaId } = req.body
+      const turma = await TurmaRepository.findOneById(turmaId)
+      if (!turma) {
+        return res.status(404).json({ error: 'Turma não encontrada!' })
+      }
 
       const result = await AulaService.post(req.body)
       return res.status(201).json(result)

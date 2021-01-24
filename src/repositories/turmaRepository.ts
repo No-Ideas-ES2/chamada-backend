@@ -122,4 +122,22 @@ export default class TurmaRepository {
     const result = await PostgresClient.query(sql, { turmaId })
     return result.rows
   }
+
+  static async existAluno(turmaId: string, alunoId: string): Promise<boolean> {
+    const sql = `
+    SELECT
+      COUNT(ta.aluno_id) AS "count"
+    FROM 
+      turma_alunos ta 
+      JOIN usuario u ON u.id = aluno_id
+      JOIN turma t ON t.id = turma_id
+    WHERE
+      u.excluido_em IS NULL
+      AND t.excluido_em IS NULL
+      AND turma_id = :turmaId
+      AND aluno_id = :alunoId`
+
+    const result = await PostgresClient.query(sql, { turmaId, alunoId })
+    return result.rows[0].count > 0
+  }
 }
