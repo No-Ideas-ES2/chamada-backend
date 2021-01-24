@@ -29,4 +29,8 @@ export default class TurmaService {
   static async postAlunos(id: string, alunosId: string[]): Promise<IUsuario[]> {
     return TurmaRepository.addAlunos(id, alunosId)
   }
+
+  static async existAluno(idTurma: string, idAluno: string): Promise<boolean> {
+    return TurmaRepository.existAluno(idTurma, idAluno)
+  }
 }

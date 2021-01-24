@@ -55,7 +55,7 @@ export default class PresencaRepository {
       chamada_id, aluno_id, data
     )
     VALUES (
-      :chamadaId, :alunoId, NOW()
+      :chamadaId, :alunoId, :agora
     )`
 
     await PostgresClient.query(sql, presenca)

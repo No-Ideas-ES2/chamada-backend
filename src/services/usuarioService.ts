@@ -13,10 +13,13 @@ export default class UsuarioService {
   }
 
   static async post(usuario: any): Promise<IUsuario> {
-    return UsuarioRepository.save(usuario)
+    return UsuarioRepository.save({ ...usuario, senha: hash(usuario.senha, hashOptions) })
   }
 
   static async update(id: string, usuario: any): Promise<IUsuario> {
+    if (usuario.senha) {
+      usuario.senha = hash(usuario.senha, hashOptions)
+    }
     return UsuarioRepository.update(id, usuario)
   }
 

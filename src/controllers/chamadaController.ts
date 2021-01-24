@@ -1,4 +1,5 @@
 import { Request, Response } from 'express'
+import AulaRepository from '../repositories/aulaRepository'
 import ChamadaService from '../services/chamadaService'
 
 export default class ChamadaController {
@@ -18,6 +19,12 @@ export default class ChamadaController {
     try {
       const msg = await ChamadaService.validaChamada(req.body)
       if (msg) res.status(400).json({ error: msg })
+
+      const { aulaId } = req.body
+      const aula = await AulaRepository.findOneById(aulaId)
+      if (!aula {
+        return res.status(404).json({ error: 'Aula não encontrada!' })
+      })
 
       const result = await ChamadaService.post(req.body)
       return res.status(201).json(result)
