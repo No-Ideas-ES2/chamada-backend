@@ -22,9 +22,9 @@ export default class ChamadaController {
 
       const { aulaId } = req.body
       const aula = await AulaRepository.findOneById(aulaId)
-      if (!aula {
+      if (!aula) {
         return res.status(404).json({ error: 'Aula não encontrada!' })
-      })
+      }
 
       const result = await ChamadaService.post(req.body)
       return res.status(201).json(result)
