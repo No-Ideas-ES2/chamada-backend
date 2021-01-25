@@ -6,7 +6,7 @@ dotenv.config()
 
 const config: { database: PoolConfig, session: SessionOptions } = {
   database: {
-    connectionString: process.env.PG_URL,
+    connectionString: process.env.DATABASE_URL,
     ssl: {
       rejectUnauthorized: false
     },
